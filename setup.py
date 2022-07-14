@@ -19,5 +19,5 @@ setup(
         'Operating System :: POSIX :: Linux',
         'Operating System :: Microsoft :: Windows',
         'Programming Language :: Python :: 3.10'
-    ]
+    ],
 )

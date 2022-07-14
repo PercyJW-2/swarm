@@ -1,2 +1,5 @@
 .idea
+.tox
+.pytest_cache
+swarm.egg-info
 venv
