@@ -31,7 +31,7 @@ pages:
     - pip install sphinx sphinx-rtd-theme
     - cd doc
     - make html
-    - mv build/html/ ../public/
+    - mv _build/html/ ../public/
   artifacts:
     paths:
       - public
