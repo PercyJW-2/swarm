@@ -1,4 +1,4 @@
-image: python:3.6
+image: python:latest
 
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
@@ -9,8 +9,8 @@ cache:
     - venv/
 
 before_script:
+  - apt-get install python3.6
   - python --version
-  - whoami
   - pip install virtualenv
   - virtualenv venv
   - source venv/bin/activate
