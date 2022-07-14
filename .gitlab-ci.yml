@@ -9,9 +9,11 @@ cache:
     - venv/
 
 before_script:
-  - add-apt-repository ppa:deadsnakes/ppa
   - apt-get update
-  - apt-get install python3.6
+  - apt-get install -y software-properties-common
+  - add-apt-repository -y ppa:deadsnakes/ppa
+  - apt-get update
+  - apt-get install -y python3.6
   - python --version
   - pip install virtualenv
   - virtualenv venv
