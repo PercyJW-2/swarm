@@ -27,15 +27,18 @@ if __name__ == "__main__":
                 exit(-2)
             ip_source, port_source = parse_ip(ips[index])
 
-            connMan = ConnectionManager(addr=ip_source, port=port_source)
-            connMan.connect(list(ips))
-            try:
-                while True:
-                    print("\033[H\033[J", end="")
-                    print(f"current master: {connMan.get_current_master()}")
-                    print(f"Is Client Master? {connMan.get_current_master() == ips[index]}")
-                    sleep(1)
-            except KeyboardInterrupt:
-                connMan.disconnect()
+            connManInit = ConnectionManager(addr=ip_source, port=port_source, ip_list=ips)
+
+            with connManInit as connMan:
+                try:
+                    while True:
+                        print("\033[H\033[J", end="")
+                        print(f"current master: {connMan.get_current_master()}")
+                        print(f"client address: {ips[index]}")
+                        print(f"Is Client Master? {connMan.get_current_master() == (ip_source, port_source)}")
+                        print(f"connected IPs: {connMan.get_current_addresses()}")
+                        sleep(1)
+                except KeyboardInterrupt:
+                    print("exiting...")
         except yaml.YAMLError as exc:
             print(exc)

@@ -3,6 +3,7 @@ from unittest import TestCase
 import swarm
 import random
 from ipaddress import IPv4Address, IPv6Address
+from typing import List
 
 
 class TestStatics(TestCase):
@@ -30,22 +31,19 @@ class TestStatics(TestCase):
 
 
 class TestConnections(TestCase):
-    # ConnectionManager cannot be tested (test client hangs after successful test)
-    """
     def test_initial_connection(self):
         conn_mans = {}
         for i in range(10):
-            conn_mans[("localhost", 1000 + i)] = swarm.ConnectionManager(port=1000 + i)
+            conn_mans[("localhost:" + str(1000 + i))] = swarm.ConnectionManager(port=1000 + i)
 
         addresses = list(conn_mans.keys())
-        to_connect = []
+        to_connect: List[str] = []
         for i in range(len(addresses)):
             conn_mans[addresses[i]].connect(to_connect)
             to_connect.append(addresses[i])
 
-        master = addresses[0]
+        master = swarm._string_to_ip_and_port(addresses[0])
         for manager in conn_mans.values():
             self.assertEqual(master, manager.get_current_master())
         for manager in conn_mans.values():
             manager.disconnect()
-    """
