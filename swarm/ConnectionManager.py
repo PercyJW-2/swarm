@@ -169,6 +169,7 @@ class ConnectionManager:
 
     def _launch_socket_server(self, address: Tuple[str, int], request_handler=socketserver.BaseRequestHandler):
         socketserver.ThreadingTCPServer.allow_reuse_port = True
+        socketserver.ThreadingTCPServer.allow_reuse_address = True
         with socketserver.ThreadingTCPServer(address, request_handler) as server:
             self.socketServer = server
             server.serve_forever()
