@@ -38,7 +38,7 @@ run:
 pages:
   script:
     - source venv/bin/activate
-    - pip install sphinx sphinx-rtd-theme
+    - pip install sphinx sphinx-rtd-theme sphinx-autoapi
     - cd doc
     - make html
     - mv _build/html/ ../public/

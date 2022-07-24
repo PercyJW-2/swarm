@@ -5,7 +5,9 @@ import threading
 from enum import Enum
 import re
 from functools import partial
-from typing import List, Callable, Optional, Union, Tuple
+from typing import List, Callable, Optional, Tuple
+
+from swarm.ConnectionManagerTCPHandler import ConnectionManagerTCPHandler
 
 try:
     from time import time_ns
@@ -32,86 +34,6 @@ class MessageToBig(Exception):
 
 class InvalidIPString(Exception):
     pass
-
-
-class NotInContextManagerMode(Exception):
-    pass
-
-
-class ConnectionManagerTCPHandler(socketserver.BaseRequestHandler):
-    def __init__(self, connection_manager, *args, **kwargs):
-        self.connection_manager = connection_manager
-        super().__init__(*args, **kwargs)
-
-    # match statement is not available in Python 3.6 :(
-    def announce(self, launch_time: str, addr: str):
-        address_parsed = _string_to_ip_and_port(addr)
-        self.connection_manager.sockets[address_parsed] = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.connection_manager.sockets[address_parsed].connect(address_parsed)
-        announced_launch_time = int(launch_time)
-        updated_launch_time = False
-        while announced_launch_time in self.connection_manager.connectedIPs.values():
-            updated_launch_time = True
-            announced_launch_time = announced_launch_time + 1
-        self.connection_manager.connectedIPs[address_parsed] = announced_launch_time
-        updated_time = ""
-        if updated_launch_time:
-            updated_time = "," + str(announced_launch_time)
-        self.send_message(str(self.connection_manager.creation_time) + updated_time)
-
-    def update_launch_time(self, launch_time, addr):
-        address_parsed = _string_to_ip_and_port(addr)
-        self.connection_manager.connectedIPs[address_parsed] = int(launch_time)
-
-    def heartbeat(self):
-        self.send_message(StandardMessages.ACKNOWLEDGED.value)
-
-    def get_addresses(self):
-        address_string =\
-            ",".join([addr[0] + ":" + str(addr[1]) for addr in self.connection_manager.connectedIPs.keys()])
-        self.send_message(address_string)
-
-    def get_master(self):
-        master_addr = self.connection_manager.master_addr
-        addr_str = master_addr[0] + ":" + str(master_addr[1])
-        self.send_message(addr_str)
-
-    def default_case(self, message):
-        for func in self.connection_manager.listeners:
-            return_msg = func(message)
-            if return_msg is not None:
-                self.send_message(return_msg)
-
-    def handle(self):
-        while not self.connection_manager.stop_socketserver:
-            msg_recvd = ""
-            try:
-                msg_recvd = str(self.request.recv(self.connection_manager._buffer_size), "utf-8").lower()
-            except ConnectionError:
-                pass
-            if not msg_recvd:
-                break
-            msg_split = msg_recvd.split(":")
-            cmd = msg_split[0]
-            msg = ":".join(msg_split[1:len(msg_split)])
-            msg_args = msg.split(",")
-
-            if cmd == StandardMessages.ANNOUNCE.value:
-                self.announce(*msg_args)
-            elif cmd == StandardMessages.UPDATE_LAUNCH.value:
-                self.update_launch_time(*msg_args)
-            elif cmd == StandardMessages.HEARTBEAT.value:
-                self.heartbeat()
-            elif cmd == StandardMessages.GET_MASTER.value:
-                self.get_master()
-            elif cmd == StandardMessages.GET_ADDRESSES.value:
-                self.get_addresses()
-            else:
-                self.default_case(msg_recvd)
-
-    def send_message(self, message: Union[str, int]):
-        message = str(message).encode("utf-8")
-        self.request.sendall(message)
 
 
 def _string_to_ip_and_port(message: str) -> Tuple[str, int]:
@@ -155,9 +77,6 @@ class ConnectionManager:
         self.listeners = []
 
     def __enter__(self):
-        if self._ip_list is None:
-            raise NotInContextManagerMode("An IP List needs to be provided to the Constructor to use this class "
-                                          "with the 'with' keyword.")
         self.connect(self._ip_list)
         return self
 
@@ -263,7 +182,8 @@ class ConnectionManager:
         self.sockets.clear()
         if self.socketServerThread is not None:
             self.stop_socketserver = True
-            self.socketServer.shutdown()
+            if self.socketServer is not None:
+                self.socketServer.shutdown()
 
     def send_message(self, message: str, address: Tuple[str, int]):
         if self.sockets.get(address) is None:
