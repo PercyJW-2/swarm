@@ -212,10 +212,10 @@ class ConnectionManager:
                 ))
                 recv_msg = str(sock.recv(self._buffer_size), "utf-8")
                 recv_msgs = recv_msg.split(",")
-                self.connectedIPs[(ip, port)] = recv_msgs[0]
+                self.connectedIPs[(ip, port)] = int(recv_msgs[0])
                 if len(recv_msgs) > 1:
                     changed_start_time = True
-                    self.creation_time = recv_msgs[1]
+                    self.creation_time = int(recv_msgs[1])
             except ConnectionRefusedError:
                 pass
         if changed_start_time:

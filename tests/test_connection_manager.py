@@ -2,6 +2,7 @@ from unittest import TestCase
 
 import swarm
 import random
+import socket
 from ipaddress import IPv4Address, IPv6Address
 from typing import List
 
@@ -30,19 +31,27 @@ class TestStatics(TestCase):
         self.assertTrue(False)
 
 
+def get_port(initial_port: int) -> int:
+    while True:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+            if sock.connect_ex(("localhost", initial_port)) == 0:
+                initial_port += 1
+            else:
+                return initial_port
+
+
 class TestConnections(TestCase):
     def test_initial_connection(self):
         conn_mans = {}
-        for i in range(10):
-            conn_mans[("localhost:" + str(1000 + i))] = swarm.ConnectionManager(port=1000 + i)
-
-        addresses = list(conn_mans.keys())
         to_connect: List[str] = []
-        for i in range(len(addresses)):
-            conn_mans[addresses[i]].connect(to_connect)
-            to_connect.append(addresses[i])
+        for i in range(10):
+            possible_port = get_port(1000 + i)
+            ip_str = "localhost:" + str(possible_port)
+            conn_mans[ip_str] = swarm.ConnectionManager(port=possible_port)
+            conn_mans[ip_str].connect(to_connect)
+            to_connect.append(ip_str)
 
-        master = swarm._string_to_ip_and_port(addresses[0])
+        master = swarm._string_to_ip_and_port(to_connect[0])
         for manager in conn_mans.values():
             self.assertEqual(master, manager.get_current_master())
         for manager in conn_mans.values():
