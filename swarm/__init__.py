@@ -9,5 +9,5 @@ from .ConnectionManager import\
     ConnectionManager,\
     StandardMessages,\
     MessageToBig,\
-    _string_to_ip_and_port
+    string_to_ip_and_port
 from .statics import InvalidIPString

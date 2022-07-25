@@ -14,20 +14,20 @@ class TestStatics(TestCase):
         for i in range(1000):
             addr_str = str(IPv4Address(random.getrandbits(32)))
             port = random.randint(1, 65535)
-            (ip, port_e) = swarm.statics._string_to_ip_and_port(addr_str + ":" + str(port))
+            (ip, port_e) = swarm.statics.string_to_ip_and_port(addr_str + ":" + str(port))
             self.assertEqual((ip, port_e), (addr_str, port))
 
     def test_ipv6_str_parsing(self):
         for i in range(1000):
             addr_str = str(IPv6Address(random.getrandbits(128)))
             port = random.randint(1, 65535)
-            (ip, port_e) = swarm.statics._string_to_ip_and_port(addr_str + ":" + str(port))
+            (ip, port_e) = swarm.statics.string_to_ip_and_port(addr_str + ":" + str(port))
             self.assertEqual((ip, port_e), (addr_str, port))
 
     def test_invalid_str_parsing(self):
         invalid_sting = "invalid"
         try:
-            swarm.statics._string_to_ip_and_port(invalid_sting)
+            swarm.statics.string_to_ip_and_port(invalid_sting)
         except swarm.statics.InvalidIPString:
             return
         self.assertTrue(False)
@@ -53,7 +53,7 @@ class TestConnections(TestCase):
             conn_mans[ip_str].connect(to_connect)
             to_connect.append(ip_str)
 
-        master = swarm.statics._string_to_ip_and_port(to_connect[0])
+        master = swarm.statics.string_to_ip_and_port(to_connect[0])
         for manager in conn_mans.values():
             self.assertEqual(master, manager.get_current_master())
         for manager in conn_mans.values():

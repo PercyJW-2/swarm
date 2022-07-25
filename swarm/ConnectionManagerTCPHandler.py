@@ -2,7 +2,7 @@ import socket
 import socketserver
 from typing import Union
 
-from .statics import _string_to_ip_and_port, StandardMessages
+from .statics import string_to_ip_and_port, StandardMessages
 
 
 class ConnectionManagerTCPHandler(socketserver.BaseRequestHandler):
@@ -26,7 +26,7 @@ class ConnectionManagerTCPHandler(socketserver.BaseRequestHandler):
         :param launch_time: time when the connecting client launched
         :param addr: address of the socketserver of the connecting client
         """
-        address_parsed = _string_to_ip_and_port(addr)
+        address_parsed = string_to_ip_and_port(addr)
         self.connection_manager.sockets[address_parsed] = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.connection_manager.sockets[address_parsed].connect(address_parsed)
         announced_launch_time = int(launch_time)
@@ -48,7 +48,7 @@ class ConnectionManagerTCPHandler(socketserver.BaseRequestHandler):
         :param launch_time: updated time when the connecting client started
         :param addr: address of the connecting client
         """
-        address_parsed = _string_to_ip_and_port(addr)
+        address_parsed = string_to_ip_and_port(addr)
         self.connection_manager.connectedIPs[address_parsed] = int(launch_time)
 
     def heartbeat(self):
