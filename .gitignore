@@ -4,3 +4,4 @@
 swarm.egg-info
 venv
 build
+doc/_build

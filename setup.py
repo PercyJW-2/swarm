@@ -18,6 +18,6 @@ setup(
         'Development Status :: 1 - Planning',
         'Operating System :: POSIX :: Linux',
         'Operating System :: Microsoft :: Windows',
-        'Programming Language :: Python :: 3.10'
+        'Programming Language :: Python :: 3.6'
     ],
 )
