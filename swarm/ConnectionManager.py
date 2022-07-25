@@ -2,12 +2,11 @@ import socket
 import socketserver
 import time
 import threading
-from enum import Enum
-import re
 from functools import partial
 from typing import List, Callable, Optional, Tuple
 
-from swarm.ConnectionManagerTCPHandler import ConnectionManagerTCPHandler
+from .statics import StandardMessages, MessageToBig, _string_to_ip_and_port
+from .ConnectionManagerTCPHandler import ConnectionManagerTCPHandler
 
 try:
     from time import time_ns
@@ -17,36 +16,6 @@ except ImportError:
     def time_ns():
         now = datetime.now()
         return int(now.timestamp() * 1e9)
-
-
-class StandardMessages(Enum):
-    ANNOUNCE = "announce"
-    UPDATE_LAUNCH = "update"
-    ACKNOWLEDGED = "acknowledged"
-    HEARTBEAT = "heartbeat"
-    GET_ADDRESSES = "addresses"
-    GET_MASTER = "master"
-
-
-class MessageToBig(Exception):
-    pass
-
-
-class InvalidIPString(Exception):
-    pass
-
-
-def _string_to_ip_and_port(message: str) -> Tuple[str, int]:
-    valid_ipv4 = re.compile(r"^(\d?\d?\d.){3}\d?\d?\d:(\d?){4}\d$")
-    valid_ipv6 = re.compile(r"^([a-f\d:]+:+)+[a-f\d]+:(\d?){4}\d$")
-    valid_address = re.compile(r"^(localhost)|(\*+.\*):(\d?){4}\d$")
-    if (not valid_ipv4.match(message)) and (not valid_ipv6.match(message)) and (not valid_address.match(message)):
-        raise InvalidIPString(f"'{message}' is not an valid ip address")
-    msg_split = message.split(":")
-    port = msg_split[-1]
-    ip = ":".join(msg_split[0:-1])
-    port = int(port)
-    return ip, port
 
 
 class ConnectionManager:

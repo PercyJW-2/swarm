@@ -2,7 +2,7 @@ import socket
 import socketserver
 from typing import Union
 
-from swarm import _string_to_ip_and_port, StandardMessages
+from .statics import _string_to_ip_and_port, StandardMessages
 
 
 class ConnectionManagerTCPHandler(socketserver.BaseRequestHandler):

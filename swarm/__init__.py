@@ -8,6 +8,6 @@ __author__ = 'Joris Wachsmuth'
 from .ConnectionManager import\
     ConnectionManager,\
     StandardMessages,\
-    InvalidIPString,\
     MessageToBig,\
     _string_to_ip_and_port
+from .statics import InvalidIPString
