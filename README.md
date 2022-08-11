@@ -2,7 +2,7 @@
 
 ## API Documentation
 
-[On Github Pages](https://jwachsmuth.pages.ub.uni-bielefeld.de/swarm)
+[On Gitlab Pages](https://jwachsmuth.pages.ub.uni-bielefeld.de/swarm)
 
 ## Example Usage
 
